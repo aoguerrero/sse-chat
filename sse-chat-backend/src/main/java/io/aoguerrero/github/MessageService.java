@@ -3,26 +3,29 @@ package io.aoguerrero.github;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.annotation.Scope;
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Component;
 
 @Component
-@Scope("prototype")
 public class MessageService {
+
+    @PostConstruct
+    public void init() {
+        this.messages = new ArrayList<>();
+    }
 
     public List<Message> messages;
 
-    public void save(Message message) {
+    public void save(final Message message) {
         this.messages.add(message);
     }
 
-    public List<Message> flush() {
-        List<Message> currentMessages = new ArrayList<>();
-        for(int i = 0; i< messages.size(); i++) {
-            Message message = messages.get(i);
-            currentMessages.add(message);
-            messages.remove(message);
-        }
-        return currentMessages;
+    public Message pop() {
+        if(this.messages.size() == 0)
+            return new Message(DestinationType.END, "");
+        Message message = this.messages.get(0);
+        messages.remove(message);
+        return message;
     }
 }
